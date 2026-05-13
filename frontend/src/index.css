@@ -1,0 +1,83 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-primary: #0b1020;
+  --bg-secondary: #111827;
+  --electric: #00d9ff;
+  --cyan: #38bdf8;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text);
+  font-family: Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.glass-panel {
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(56, 189, 248, 0.2);
+  background-color: rgba(30, 41, 59, 0.55);
+  backdrop-filter: blur(24px);
+  box-shadow: 0 0 0 1px rgba(0, 217, 255, 0.08) inset,
+    0 25px 50px -12px rgba(0, 0, 0, 0.45);
+}
+
+.neon-border {
+  position: relative;
+}
+.neon-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 217, 255, 0.6),
+    rgba(56, 189, 248, 0.2),
+    rgba(0, 217, 255, 0.5)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, #f8fafc, #00d9ff, #38bdf8, #f8fafc);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 200% center;
+  }
+}
