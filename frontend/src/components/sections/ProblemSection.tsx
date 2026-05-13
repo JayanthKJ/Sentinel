@@ -106,7 +106,7 @@ export function ProblemSection() {
                 whileHover={{ y: -8, rotateX: 4, rotateY: fromLeft ? 3 : -3 }}
                 transition={{ type: "spring", stiffness: 260, damping: 22 }}
               >
-                <div className="glass-panel neon-border relative h-full overflow-hidden rounded-2xl p-6 transition-shadow duration-300 group-hover:shadow-neon">
+                <div className="glass-panel neon-border relative h-full overflow-hidden rounded-2xl p-4 transition-shadow duration-300 group-hover:shadow-neon md:p-5">
                   <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-electric/10 blur-3xl transition-opacity group-hover:opacity-100" />
                   <div className="mb-4 inline-flex rounded-xl border border-electric/30 bg-electric/10 p-3 text-electric shadow-neon-sm">
                     <Icon className="h-6 w-6" />

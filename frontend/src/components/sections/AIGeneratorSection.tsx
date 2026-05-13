@@ -91,7 +91,7 @@ export function AIGeneratorSection() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="glass-panel neon-border relative rounded-3xl p-6 md:p-8"
+            className="glass-panel neon-border relative rounded-2xl p-4 md:p-5 lg:rounded-3xl"
           >
             <div className="mb-4 flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-muted">
               <Cpu className="h-4 w-4 text-electric" />
@@ -140,7 +140,7 @@ export function AIGeneratorSection() {
             className="relative min-h-[420px]"
           >
             {(phase === "idle" || phase === "typing") && (
-              <div className="glass-panel neon-border flex h-full min-h-[420px] flex-col items-center justify-center rounded-3xl border-dashed p-8 text-center">
+              <div className="glass-panel neon-border flex h-full min-h-[320px] flex-col items-center justify-center rounded-2xl border-dashed p-5 text-center md:min-h-[360px] lg:rounded-3xl">
                 <p className="text-xs uppercase tracking-[0.35em] text-muted">
                   Awaiting synthesis
                 </p>
@@ -158,7 +158,7 @@ export function AIGeneratorSection() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
                   style={{ perspective: 1400 }}
-                  className="glass-panel neon-border relative overflow-hidden rounded-3xl p-5 md:p-6"
+                  className="glass-panel neon-border relative overflow-hidden rounded-2xl p-4 md:p-5 lg:rounded-3xl"
                 >
                   <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                     <div>

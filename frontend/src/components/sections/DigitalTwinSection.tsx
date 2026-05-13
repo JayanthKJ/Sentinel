@@ -76,7 +76,7 @@ export function DigitalTwinSection() {
           </p>
         </motion.div>
 
-        <div className="glass-panel neon-border relative mt-14 overflow-hidden rounded-3xl p-6 md:p-10">
+        <div className="glass-panel neon-border relative mt-14 overflow-hidden rounded-2xl p-4 md:p-6 lg:rounded-3xl">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(0,217,255,0.12),transparent_55%)]" />
           <svg
             viewBox="0 0 900 420"

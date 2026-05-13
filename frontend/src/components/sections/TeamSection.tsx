@@ -55,7 +55,7 @@ export function TeamSection() {
               style={{ perspective: 900 }}
               className="group"
             >
-              <div className="glass-panel neon-border relative overflow-hidden rounded-2xl p-5 text-center transition-shadow duration-300 group-hover:shadow-neon">
+              <div className="glass-panel neon-border relative overflow-hidden rounded-2xl p-4 text-center transition-shadow duration-300 group-hover:shadow-neon md:p-5">
                 <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-electric/40 to-cyan/25 font-display text-lg font-bold text-bg-primary shadow-neon-sm">
                   {m.name
                     .split(" ")

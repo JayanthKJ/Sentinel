@@ -39,7 +39,7 @@ export function VoiceAssistantSection() {
           transition={{ duration: 0.7 }}
           className="relative mx-auto mt-14 max-w-xl"
         >
-          <div className="glass-panel neon-border relative rounded-[2.5rem] px-8 py-12 md:px-12 md:py-16">
+          <div className="glass-panel neon-border relative rounded-3xl px-5 py-8 md:rounded-[2rem] md:px-8 md:py-10">
             <div className="pointer-events-none absolute inset-0 rounded-[2.5rem] bg-[radial-gradient(circle_at_50%_0%,rgba(0,217,255,0.25),transparent_60%)]" />
 
             <div className="relative flex flex-col items-center">

@@ -46,7 +46,7 @@ export function ContactSection() {
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="glass-panel neon-border rounded-2xl p-6"
+            className="glass-panel neon-border rounded-2xl p-4 md:p-5"
           >
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-muted">
               Quick navigation

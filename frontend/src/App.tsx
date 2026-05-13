@@ -28,7 +28,7 @@ export default function App() {
         className="relative min-h-screen bg-bg-primary text-surface"
       >
         <Navbar active={active} />
-        <main className="pb-[4.5rem] md:pb-0 md:pr-[7.5rem] lg:pr-[8.5rem]">
+        <main className="pb-[7.25rem] sm:pb-[7.75rem] md:pb-[8.25rem]">
           <HeroSection />
           <ProblemSection />
           <AIGeneratorSection />

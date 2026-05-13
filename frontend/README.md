@@ -32,7 +32,7 @@ npm run preview   # optional: serve dist
 
 | Area | Description |
 |------|-------------|
-| **Scroll-reveal navigation** | No top pill bar. Desktop: vertical button rail on the right; buttons unlock one-by-one as you scroll, with spring motion, shimmer sweep, gradient spine, and active glow. Mobile: horizontal chips at the bottom with the same scroll-linked reveal. |
+| **Main-page scroll navigation** | Centered bottom “deck” on the viewport (not a side rail): glass panel, page scroll progress bar, and numbered section buttons that **spring in one-by-one** as you scroll down; tap any unlocked button to jump. Subtle gradient scrim behind it so it feels part of the page. |
 | **Hero** | Full-viewport grid, particles, animated SVG “circuits”, 3D object, staggered headline, parallax on scroll, CTAs. |
 | **Problem** | Six cards on legacy HMI pain points; GSAP stagger on scroll; 3D tilt on hover. |
 | **AI Generator** | Simulated prompt typing, “Generating…” pulse, holographic dashboard preview (gauges, pressure chart, tanks, pumps, alert). |

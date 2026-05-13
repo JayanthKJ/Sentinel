@@ -111,7 +111,7 @@ export function LiveDashboardSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.7 }}
-          className="glass-panel neon-border mt-12 rounded-3xl p-4 md:p-6"
+          className="glass-panel neon-border mt-12 rounded-2xl p-3 md:p-4 lg:rounded-3xl"
         >
           <div className="grid gap-4 lg:grid-cols-4">
             <div className="rounded-2xl border border-cyan-500/20 bg-bg-secondary/70 p-4 lg:col-span-1">
@@ -207,7 +207,7 @@ export function LiveDashboardSection() {
             </div>
 
             <div className="rounded-2xl border border-cyan-500/15 bg-bg-secondary/60 p-4">
-              <p className="text-xs text-muted">Machine health</p>
+              <p className="text-xs font-semibold text-surface">Machine health</p>
               <div className="mt-2 h-44">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -217,33 +217,51 @@ export function LiveDashboardSection() {
                       outerRadius={68}
                       paddingAngle={4}
                       dataKey="value"
+                      stroke="#0B1020"
+                      strokeWidth={2}
+                      isAnimationActive={false}
+                      label={false}
                     >
                       {health.map((_, i) => (
                         <Cell key={i} fill={pieColors[i % pieColors.length]} />
                       ))}
                     </Pie>
                     <Tooltip
-                      contentStyle={{
-                        background: "#0B1020",
-                        border: "1px solid rgba(56,189,248,0.35)",
-                        borderRadius: 12,
-                        color: "#F8FAFC",
+                      cursor={{ fill: "rgba(0, 217, 255, 0.12)" }}
+                      content={({ active, payload }) => {
+                        if (!active || !payload?.length) return null;
+                        const row = payload[0];
+                        return (
+                          <div className="min-w-[130px] rounded-xl border border-cyan-500/40 bg-[#0B1020] px-3 py-2 shadow-xl">
+                            <p className="text-sm font-semibold text-surface">
+                              {row.name}
+                            </p>
+                            <p className="mt-0.5 text-xs tabular-nums text-electric">
+                              {row.value}%
+                            </p>
+                          </div>
+                        );
                       }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-2 space-y-1 text-[11px] text-muted">
+              <div className="mt-2 space-y-1.5 text-[11px]">
                 {health.map((h, i) => (
-                  <div key={h.name} className="flex items-center justify-between">
-                    <span className="flex items-center gap-2">
+                  <div
+                    key={h.name}
+                    className="flex items-center justify-between gap-2 text-surface"
+                  >
+                    <span className="flex min-w-0 items-center gap-2">
                       <span
-                        className="h-2 w-2 rounded-full"
+                        className="h-2 w-2 shrink-0 rounded-full ring-1 ring-surface/30"
                         style={{ background: pieColors[i % pieColors.length] }}
                       />
-                      {h.name}
+                      <span className="truncate font-medium">{h.name}</span>
                     </span>
-                    <span>{h.value}%</span>
+                    <span className="shrink-0 tabular-nums font-semibold text-electric">
+                      {h.value}%
+                    </span>
                   </div>
                 ))}
               </div>

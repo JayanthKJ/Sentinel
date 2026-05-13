@@ -146,7 +146,7 @@ export function HeroSection() {
           style={{ perspective: 1200 }}
           className="relative flex justify-center lg:justify-end"
         >
-          <div className="glass-panel neon-border relative rounded-3xl p-6 md:p-8">
+          <div className="glass-panel neon-border relative rounded-2xl p-4 md:p-5 lg:rounded-3xl">
             <div className="absolute -left-6 -top-6 h-24 w-24 rounded-full bg-electric/20 blur-3xl" />
             <div className="absolute -bottom-10 -right-10 h-32 w-32 rounded-full bg-cyan/25 blur-3xl" />
             <motion.div

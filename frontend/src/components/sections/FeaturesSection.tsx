@@ -112,7 +112,7 @@ export function FeaturesSection() {
                 style={{ perspective: 900 }}
                 className="group relative"
               >
-                <div className="glass-panel neon-border relative h-full overflow-hidden rounded-2xl p-6 transition-shadow duration-300 group-hover:shadow-neon">
+                <div className="glass-panel neon-border relative h-full overflow-hidden rounded-2xl p-4 transition-shadow duration-300 group-hover:shadow-neon md:p-5">
                   <motion.div
                     className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                     style={{
