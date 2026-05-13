@@ -32,7 +32,7 @@ npm run preview   # optional: serve dist
 
 | Area | Description |
 |------|-------------|
-| **Main-page scroll navigation** | Centered bottom “deck” on the viewport (not a side rail): glass panel, page scroll progress bar, and numbered section buttons that **spring in one-by-one** as you scroll down; tap any unlocked button to jump. Subtle gradient scrim behind it so it feels part of the page. |
+| **Main-page scroll navigation** | **Below 3D + CTAs:** **2-column grid** (larger chips), alternating **row zigzag**. No outer frame. Each chip **fades and lifts in one-by-one** as **hero scroll progress** passes staggered thresholds (`index / 8`). |
 | **Hero** | Full-viewport grid, particles, animated SVG “circuits”, 3D object, staggered headline, parallax on scroll, CTAs. |
 | **Problem** | Six cards on legacy HMI pain points; GSAP stagger on scroll; 3D tilt on hover. |
 | **AI Generator** | Simulated prompt typing, “Generating…” pulse, holographic dashboard preview (gauges, pressure chart, tanks, pumps, alert). |
@@ -62,12 +62,12 @@ Fonts: **Inter** + **Orbitron** (Google Fonts, linked in `src/index.css`).
 frontend/
 ├── public/           # static assets (e.g. favicon)
 ├── src/
-│   ├── App.tsx       # page shell, Lenis, sections order
+│   ├── App.tsx       # page shell, Lenis, sections order, passes active section to hero
 │   ├── main.tsx
 │   ├── index.css     # Tailwind + global glass / neon / gradient text
 │   ├── constants/    # section IDs + nav config
 │   ├── hooks/        # Lenis, scroll-spy for navbar
-│   └── components/   # Navbar, particles, circuits, section modules
+│   └── components/   # HeroNavigateDeck, particles, circuits, section modules
 ├── index.html
 ├── package.json
 ├── vite.config.ts

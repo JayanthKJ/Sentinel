@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useLenis } from "./hooks/useLenis";
 import { useNavActiveSection } from "./hooks/useNavActiveSection";
-import { Navbar } from "./components/Navbar";
 import { HeroSection } from "./components/sections/HeroSection";
 import { ProblemSection } from "./components/sections/ProblemSection";
 import { AIGeneratorSection } from "./components/sections/AIGeneratorSection";
@@ -12,6 +11,7 @@ import { VoiceAssistantSection } from "./components/sections/VoiceAssistantSecti
 import { SimulationSection } from "./components/sections/SimulationSection";
 import { TeamSection } from "./components/sections/TeamSection";
 import { ContactSection } from "./components/sections/ContactSection";
+import { ScrollToHomeButton } from "./components/ScrollToHomeButton";
 
 export default function App() {
   useLenis();
@@ -27,9 +27,8 @@ export default function App() {
         transition={{ duration: 0.5 }}
         className="relative min-h-screen bg-bg-primary text-surface"
       >
-        <Navbar active={active} />
-        <main className="pb-[7.25rem] sm:pb-[7.75rem] md:pb-[8.25rem]">
-          <HeroSection />
+        <main>
+          <HeroSection activeSection={active} />
           <ProblemSection />
           <AIGeneratorSection />
           <FeaturesSection />
@@ -40,6 +39,7 @@ export default function App() {
           <TeamSection />
           <ContactSection />
         </main>
+        <ScrollToHomeButton />
       </motion.div>
     </AnimatePresence>
   );

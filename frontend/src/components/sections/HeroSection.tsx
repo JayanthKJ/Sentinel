@@ -4,8 +4,14 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { Hero3D } from "./Hero3D";
 import { ParticleField } from "../ParticleField";
 import { CircuitBackdrop } from "../CircuitBackdrop";
+import { HeroNavigateDeck } from "../HeroNavigateDeck";
+import type { SectionId } from "../../constants/sections";
 
-export function HeroSection() {
+type Props = {
+  activeSection: SectionId;
+};
+
+export function HeroSection({ activeSection }: Props) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -22,7 +28,7 @@ export function HeroSection() {
     <section
       ref={ref}
       id="home"
-      className="relative flex min-h-screen flex-col justify-center overflow-hidden px-4 pb-24 pt-28 md:px-10"
+      className="relative flex min-h-screen flex-col justify-center overflow-hidden px-4 pb-20 pt-28 md:px-10 md:pb-24"
     >
       <motion.div style={{ y: yBg, opacity }} className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-bg-primary" />
@@ -39,8 +45,8 @@ export function HeroSection() {
         <CircuitBackdrop />
       </motion.div>
 
-      <div className="mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
-        <div>
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-12">
+        <div className="order-1 lg:order-none">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -104,10 +110,10 @@ export function HeroSection() {
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.75, duration: 0.6 }}
-            className="mt-10 flex flex-wrap gap-4"
+            transition={{ delay: 0.85, duration: 0.6 }}
+            className="mt-10 flex flex-wrap gap-x-4 gap-y-3"
           >
             <motion.button
               type="button"
@@ -144,9 +150,9 @@ export function HeroSection() {
           animate={{ opacity: 1, scale: 1, rotateX: 0 }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
           style={{ perspective: 1200 }}
-          className="relative flex justify-center lg:justify-end"
+          className="order-2 flex flex-col items-center justify-center lg:order-none lg:items-end"
         >
-          <div className="glass-panel neon-border relative rounded-2xl p-4 md:p-5 lg:rounded-3xl">
+          <div className="glass-panel neon-border relative w-full max-w-[540px] rounded-2xl p-4 md:p-5 lg:rounded-3xl">
             <div className="absolute -left-6 -top-6 h-24 w-24 rounded-full bg-electric/20 blur-3xl" />
             <div className="absolute -bottom-10 -right-10 h-32 w-32 rounded-full bg-cyan/25 blur-3xl" />
             <motion.div
@@ -160,6 +166,11 @@ export function HeroSection() {
             </p>
           </div>
         </motion.div>
+
+        <HeroNavigateDeck
+          active={activeSection}
+          heroScrollProgress={scrollYProgress}
+        />
       </div>
     </section>
   );
