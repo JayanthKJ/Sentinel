@@ -81,6 +81,39 @@ export function LiveDashboardSection() {
       .then((data) => setAlarms(data.incidents));
   }, []);
 
+  // trigger re-renders so relative times refresh periodically
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setTick(Date.now()), 30000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const formatTimestamp = (ts: string) => {
+    const d = new Date(ts);
+    if (Number.isNaN(d.getTime())) return ts;
+    return new Intl.DateTimeFormat(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(d);
+  };
+
+  const timeAgo = (ts: string) => {
+    const d = new Date(ts);
+    if (Number.isNaN(d.getTime())) return "";
+    const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
+    const rtf = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+    if (Math.abs(seconds) < 60) return rtf.format(-seconds, "second");
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return rtf.format(-minutes, "minute");
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return rtf.format(-hours, "hour");
+    const days = Math.floor(hours / 24);
+    return rtf.format(-days, "day");
+  };
+
   return (
     <section
       id="live-demo"
@@ -330,9 +363,14 @@ export function LiveDashboardSection() {
                           : "border-cyan-500/20 text-muted"
                     }`}
                   >
-                    <p className="text-[10px] uppercase tracking-wide opacity-70">
-                      {a.timestamp}
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] uppercase tracking-wide opacity-70">
+                        {formatTimestamp(a.timestamp)}
+                      </p>
+                      <p className="text-[10px] opacity-70 text-muted ml-2">
+                        {timeAgo(a.timestamp)}
+                      </p>
+                    </div>
                     <p className="mt-1 leading-snug">{a.incident_title}</p>
                   </div>
                 ))}
