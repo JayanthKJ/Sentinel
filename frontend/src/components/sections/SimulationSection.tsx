@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { createElement, useState } from "react";
-import { AlertOctagon, Flame, PlugZap, Gauge, Power } from "lucide-react";
+import { AlertOctagon, Flame, PlugZap, Gauge, Power, Loader2, Play } from "lucide-react";
 
 type Scenario = {
   key: string;
@@ -45,11 +45,58 @@ const SCENARIOS: Scenario[] = [
 export function SimulationSection() {
   const [open, setOpen] = useState<Scenario | null>(null);
   const [flash, setFlash] = useState(false);
+  const [running, setRunning] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
+
+  const apiUrl = (path: string) => {
+    const base = import.meta.env.VITE_API_BASE_URL;
+
+    if (base) {
+      return `${base.replace(/\/$/, "")}${path}`;
+    }
+
+    if (window.location.port === "5173" || window.location.port === "4173") {
+      return `http://localhost:5000${path}`;
+    }
+
+    return path;
+  };
 
   const trigger = (s: Scenario) => {
     setOpen(s);
     setFlash(true);
     window.setTimeout(() => setFlash(false), 420);
+  };
+
+  const runSimulation = async () => {
+    try {
+      setRunning(true);
+      setStatus(null);
+
+      const response = await fetch(apiUrl("/api/simulate"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ count: 10 }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Simulation request failed");
+      }
+
+      setStatus(
+        `Generated ${data.events_generated} events and detected ${data.incidents_detected} incidents.`
+      );
+      setFlash(true);
+      window.setTimeout(() => setFlash(false), 420);
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Unable to run simulation");
+    } finally {
+      setRunning(false);
+    }
   };
 
   return (
@@ -88,8 +135,19 @@ export function SimulationSection() {
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 flex flex-wrap justify-center gap-3"
+          className="mt-12 flex flex-wrap items-center justify-center gap-3"
         >
+          <motion.button
+            type="button"
+            onClick={runSimulation}
+            whileHover={{ scale: 1.04, boxShadow: "0 0 28px rgba(0,217,255,0.35)" }}
+            whileTap={{ scale: 0.97 }}
+            disabled={running}
+            className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-[rgba(14,22,38,0.85)] px-5 py-3 text-xs font-semibold uppercase tracking-wide text-electric backdrop-blur-xl transition disabled:cursor-not-allowed disabled:opacity-60 md:text-sm"
+          >
+            {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+            {running ? "Running simulation" : "Run simulation"}
+          </motion.button>
           {[
             { label: "Trigger Fire", s: SCENARIOS[0] },
             { label: "Pump Failure", s: SCENARIOS[1] },
@@ -109,6 +167,16 @@ export function SimulationSection() {
             </motion.button>
           ))}
         </motion.div>
+
+        {status && (
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mx-auto mt-5 max-w-2xl text-center text-sm text-muted"
+          >
+            {status}
+          </motion.p>
+        )}
       </div>
 
       <AnimatePresence>

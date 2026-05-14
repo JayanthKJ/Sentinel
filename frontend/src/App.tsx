@@ -9,6 +9,7 @@ import { LiveDashboardSection } from "./components/sections/LiveDashboardSection
 import { DigitalTwinSection } from "./components/sections/DigitalTwinSection";
 import { VoiceAssistantSection } from "./components/sections/VoiceAssistantSection";
 import { SimulationSection } from "./components/sections/SimulationSection";
+import { OutputSection } from "./components/sections/OutputSection";
 import { TeamSection } from "./components/sections/TeamSection";
 import { ContactSection } from "./components/sections/ContactSection";
 import { ScrollToHomeButton } from "./components/ScrollToHomeButton";
@@ -36,6 +37,7 @@ export default function App() {
           <DigitalTwinSection />
           <VoiceAssistantSection />
           <SimulationSection />
+          <OutputSection />
           <TeamSection />
           <ContactSection />
         </main>

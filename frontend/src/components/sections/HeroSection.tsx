@@ -28,7 +28,7 @@ export function HeroSection({ activeSection }: Props) {
     <section
       ref={ref}
       id="home"
-      className="relative flex min-h-screen flex-col justify-center overflow-hidden px-4 pb-20 pt-28 md:px-10 md:pb-24"
+      className="relative flex min-h-screen flex-col justify-center overflow-visible px-4 pb-20 pt-28 md:px-10 md:pb-24"
     >
       <motion.div style={{ y: yBg, opacity }} className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-bg-primary" />

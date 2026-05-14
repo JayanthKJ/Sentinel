@@ -1,6 +1,6 @@
 # SmartHMI AI — Frontend
 
-Single-page marketing and demo experience for **SmartHMI AI**, an AI-powered industrial HMI / control dashboard concept (hackathon build). This folder contains the full **frontend-only** application; there is no backend in this repo.
+Single-page marketing and demo experience for **SmartHMI AI**, an AI-powered industrial HMI / control dashboard concept (hackathon build). This frontend now connects to the Sentinel backend for simulation and summary display.
 
 ## Tech stack
 
@@ -11,7 +11,18 @@ Single-page marketing and demo experience for **SmartHMI AI**, an AI-powered ind
 - **Lenis** — smooth scrolling, integrated with GSAP’s ticker for ScrollTrigger compatibility
 - **React Three Fiber** + **Three.js** + **@react-three/drei** — hero 3D hologram (distorted icosahedron)
 - **Recharts** — AI generator preview charts, live demo area / flow / health charts
+- **Fetch API** — simulation and dashboard summary requests to the backend
 - **Lucide React** — icons across sections
+
+## Backend integration
+
+The frontend talks to the Flask backend in `../backend`.
+
+- `POST /api/simulate` generates mock events and incidents
+- `GET /api/dashboard` returns the summary used in the output display section
+- `GET /api/incidents` powers the live dashboard incident feed
+
+If needed, set `VITE_API_BASE_URL` to point the app at a different backend host.
 
 ## Run locally
 
@@ -40,9 +51,16 @@ npm run preview   # optional: serve dist
 | **Live Demo** | Industrial-style dashboard mockup with fake live-updating metrics, area chart, pie health, line chart, alarm feed. |
 | **Digital Twin** | SVG process schematic, GSAP-animated pipe strokes, nodes, buffer tank fill animation. |
 | **Voice** | Mic orb, pulse rings, animated waveform bars, sample voice commands. |
-| **Simulation** | Buttons for incident types; red flash + modal with dramatic styling (frontend-only, no real control). |
+| **Simulation** | Buttons for incident types; red flash + modal with dramatic styling and a real `POST /api/simulate` action. |
+| **Output display** | Backend-driven summary page with log-analysis metrics, severity breakdown, system breakdown, and refresh/analyze controls. |
 | **Team** | Four placeholder team cards with glass styling and social icons. |
 | **Contact / footer** | Branding, quick nav links, placeholder contact and socials. |
+
+## Navigation behavior
+
+- The hero navigation chips appear as staggered cards during scroll.
+- The deck stays pinned while scrolling through the hero area.
+- The floating return button changes into a clearer return control near the end of the page.
 
 ## Design tokens (strict theme)
 
@@ -80,4 +98,4 @@ frontend/
 ## Notes
 
 - **Bundle size**: Three.js / R3F adds a large JS chunk; acceptable for a demo. You can lazy-load the hero `Canvas` later if you need a smaller first load.
-- **Data**: All numbers, alarms, and “AI” behavior are simulated in the browser for presentation.
+- **Data**: Hero and visual effects are simulated in the browser; the output display and simulation controls now query the backend for real summary data.

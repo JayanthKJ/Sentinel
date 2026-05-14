@@ -1,10 +1,18 @@
 import { motion, useTransform, type MotionValue } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 import { NAV_ITEMS, type SectionId } from "../constants/sections";
 
 /** First chip starts here; each chip gets its own slot so they appear strictly one after another */
 const REVEAL_START = 0.1;
 const SLOT = 0.078;
 const SLOT_GAP = 0.006;
+
+const CHIP_ACCENTS = [
+  "from-electric/25 to-cyan-500/10 text-electric border-electric/45",
+  "from-cyan-500/20 to-sky-500/10 text-cyan border-cyan-400/45",
+  "from-success/20 to-emerald-500/10 text-success border-success/45",
+  "from-fuchsia-500/20 to-violet-500/10 text-fuchsia-300 border-fuchsia-400/45",
+];
 
 type Props = {
   active: SectionId;
@@ -93,6 +101,11 @@ function NavChip({
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const accent = CHIP_ACCENTS[stackIndex % CHIP_ACCENTS.length];
+  const ringShift =
+    stackIndex % 2 === 0 ? "group-hover:translate-x-1" : "group-hover:-translate-x-1";
+  const number = String(stackIndex + 1).padStart(2, "0");
+
   return (
     <motion.div
       style={{
@@ -113,19 +126,28 @@ function NavChip({
         type="button"
         onClick={() => go(nav.id)}
         whileHover={{
-          rotateX: -4,
-          rotateY: 2,
+          rotateX: -6,
+          rotateY: stackIndex % 2 === 0 ? 4 : -4,
           translateZ: 12,
           boxShadow: "0 0 32px rgba(0,217,255,0.45)",
         }}
         transition={{ type: "spring", stiffness: 420, damping: 22 }}
         style={{ transformStyle: "preserve-3d" }}
-        className={`relative w-full max-w-[min(100%,18rem)] border px-4 py-3.5 text-xs font-bold uppercase tracking-wide backdrop-blur-sm transition-colors sm:max-w-[min(100%,20rem)] sm:px-5 sm:py-4 sm:text-sm md:max-w-[min(100%,22rem)] md:px-6 md:py-5 md:text-[15px] md:tracking-[0.12em] ${
+        className={`group relative w-full max-w-[min(100%,18rem)] overflow-hidden border px-4 py-3.5 text-xs font-bold uppercase tracking-wide backdrop-blur-sm transition-colors sm:max-w-[min(100%,20rem)] sm:px-5 sm:py-4 sm:text-sm md:max-w-[min(100%,22rem)] md:px-6 md:py-5 md:text-[15px] md:tracking-[0.12em] ${
           isActive
             ? "border-electric/70 bg-electric/20 text-electric shadow-neon-sm"
-            : "border-cyan-500/35 bg-[rgba(11,16,32,0.78)] text-surface/90 hover:border-electric/55 hover:text-electric"
+            : `border-cyan-500/35 bg-[rgba(11,16,32,0.78)] text-surface/90 hover:border-electric/55 hover:text-electric bg-gradient-to-br ${accent}`
         } rounded-2xl`}
       >
+        <motion.span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-electric to-cyan opacity-80"
+          animate={{ opacity: isActive ? [0.7, 1, 0.7] : 0.55 }}
+          transition={{ duration: 1.8, repeat: Infinity }}
+        />
+        <span className="pointer-events-none absolute right-3 top-3 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] tracking-[0.24em] text-muted/90">
+          {number}
+        </span>
         {isActive && (
           <motion.span
             layoutId="hero-nav-active"
@@ -133,7 +155,10 @@ function NavChip({
             transition={{ type: "spring", stiffness: 400, damping: 32 }}
           />
         )}
-        <span className="line-clamp-2 text-center leading-tight">{nav.label}</span>
+        <span className="relative z-10 flex items-center justify-center gap-2 line-clamp-2 text-center leading-tight">
+          <ArrowUpRight className={`h-3.5 w-3.5 opacity-80 transition-transform ${ringShift}`} />
+          {nav.label}
+        </span>
       </motion.button>
     </motion.div>
   );
@@ -148,8 +173,45 @@ export function HeroNavigateDeck({ active, heroScrollProgress }: Props) {
   const captionY = useTransform(heroScrollProgress, [0, 0.12], [14, 0]);
 
   return (
-    <div className="col-span-full order-3 mt-16 w-full md:mt-24">
-      <div className="mx-auto max-w-2xl px-2 md:max-w-4xl lg:max-w-5xl">
+    <>
+      {/* Fixed Side-Rail Navigation - Right Side, Partially Hidden Until Hover */}
+      <div className="pointer-events-none fixed bottom-0 right-0 top-0 z-40 hidden flex-col items-center justify-center py-8 md:flex pr-2">
+        <motion.div
+          initial={{ x: 120 }}
+          whileHover={{ x: 0 }}
+          transition={{ type: "spring", stiffness: 400, damping: 30 }}
+          className="pointer-events-auto group relative flex flex-col gap-3 rounded-lg bg-[rgba(11,16,32,0.85)] backdrop-blur-md p-3 border border-cyan-500/20 hover:border-electric/40 hover:shadow-neon-sm"
+        >
+          {/* Buttons - Slide In on Hover */}
+          <motion.div className="flex flex-col gap-3">
+            {NAV_ITEMS.map((nav, idx) => {
+              const isActive = nav.id === active;
+              const accentIdx = idx % CHIP_ACCENTS.length;
+              const accent = CHIP_ACCENTS[accentIdx];
+              return (
+                <motion.button
+                  key={nav.id}
+                  type="button"
+                  onClick={() => document.getElementById(nav.id)?.scrollIntoView({ behavior: "smooth" })}
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ type: "spring", stiffness: 420, damping: 22 }}
+                  className={`px-3 py-2 rounded-lg border text-xs font-bold uppercase tracking-wide transition-all backdrop-blur-sm ${
+                    isActive
+                      ? "border-electric/70 bg-electric/20 text-electric shadow-neon-sm"
+                      : `border-cyan-500/35 bg-[rgba(11,16,32,0.78)] text-surface/90 hover:border-electric/55 hover:text-electric bg-gradient-to-br ${accent}`
+                  }`}
+                >
+                  {nav.label}
+                </motion.button>
+              );
+            })}
+          </motion.div>
+        </motion.div>
+      </div>
+
+      {/* In-Page Sticky Hero Deck - All Devices */}
+      <div className="col-span-full order-3 mt-16 w-full md:mt-24">
+        <div className="sticky top-6 z-20 mx-auto max-w-2xl px-2 md:top-8 md:max-w-4xl lg:max-w-5xl">
         <motion.p
           className="mb-4 text-center font-display text-[9px] font-semibold uppercase tracking-[0.28em] text-electric/70 md:mb-5 md:text-[10px]"
           style={{ opacity: captionOpacity, y: captionY }}
@@ -181,7 +243,8 @@ export function HeroNavigateDeck({ active, heroScrollProgress }: Props) {
             );
           })}
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
