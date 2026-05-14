@@ -66,11 +66,20 @@ export function LiveDashboardSection() {
     { name: "Offline", value: 6 },
   ];
 
-  const alarms = [
-    { t: "09:12:04", m: "Line 3 · Motor bearing temp rising", s: "warn" },
-    { t: "09:11:51", m: "Compressor inlet filter differential OK", s: "ok" },
-    { t: "09:10:18", m: "Batch reactor cooling margin < 10%", s: "crit" },
-  ] as const;
+  type Alarm = {
+    incident_id: string;
+    timestamp: string;
+    incident_title: string;
+    priority: string;
+  };
+
+  const [alarms, setAlarms] = useState<Alarm[]>([]);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/incidents")
+      .then((res) => res.json())
+      .then((data) => setAlarms(data.incidents));
+  }, []);
 
   return (
     <section
@@ -312,19 +321,19 @@ export function LiveDashboardSection() {
               <div className="space-y-3">
                 {alarms.map((a) => (
                   <div
-                    key={a.t + a.m}
+                    key={a.timestamp + a.incident_title}
                     className={`rounded-xl border px-3 py-2 text-[11px] ${
-                      a.s === "crit"
+                      a.priority === "CRITICAL"
                         ? "border-danger/50 bg-danger/10 text-danger"
-                        : a.s === "warn"
+                        : a.priority === "WARNING"
                           ? "border-electric/40 bg-electric/5 text-surface"
                           : "border-cyan-500/20 text-muted"
                     }`}
                   >
                     <p className="text-[10px] uppercase tracking-wide opacity-70">
-                      {a.t}
+                      {a.timestamp}
                     </p>
-                    <p className="mt-1 leading-snug">{a.m}</p>
+                    <p className="mt-1 leading-snug">{a.incident_title}</p>
                   </div>
                 ))}
               </div>

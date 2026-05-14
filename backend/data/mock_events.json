@@ -1,0 +1,32 @@
+{
+  "sample_events": [
+    {
+      "event_id": "evt_001",
+      "timestamp": "2024-01-15T10:30:00",
+      "severity": "high",
+      "system": "cooling_system",
+      "event_type": "temperature_rising",
+      "message": "Temperature exceeding normal range in sector A",
+      "status": "active"
+    },
+    {
+      "event_id": "evt_002",
+      "timestamp": "2024-01-15T10:31:00",
+      "severity": "critical",
+      "system": "cooling_system",
+      "event_type": "fan_failure",
+      "message": "Cooling fan FAN-003 has stopped responding",
+      "status": "active"
+    },
+    {
+      "event_id": "evt_003",
+      "timestamp": "2024-01-15T10:32:00",
+      "severity": "high",
+      "system": "cooling_system",
+      "event_type": "coolant_low",
+      "message": "Coolant level below threshold",
+      "status": "active"
+    }
+  ],
+  "description": "This file contains sample event data. The simulator generates similar events dynamically."
+}
