@@ -21,8 +21,9 @@ const pieColors = ["#00D9FF", "#38BDF8", "#10B981", "#64748B"];
 export function LiveDashboardSection() {
   const [temp, setTemp] = useState(82.4);
   const [pressure, setPressure] = useState(6.12);
-  const [flow, setFlow] = useState(128);
-  const [efficiency, setEfficiency] = useState(93.2);
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [eventTrend, setEventTrend] = useState<any[]>([]);
+  const [criticalTrend, setCriticalTrend] = useState<any[]>([]);
 
   const trend = useMemo(
     () =>
@@ -39,10 +40,6 @@ export function LiveDashboardSection() {
     const id = window.setInterval(() => {
       setTemp((v) => Number((v + (Math.random() - 0.5) * 0.6).toFixed(1)));
       setPressure((v) => Number((v + (Math.random() - 0.5) * 0.08).toFixed(2)));
-      setFlow((v) => Math.max(90, Math.round(v + (Math.random() - 0.5) * 6)));
-      setEfficiency((v) =>
-        Math.min(99, Math.max(86, Number((v + (Math.random() - 0.5) * 0.4).toFixed(1))))
-      );
       setTrendData((d) => {
         const next = [...d.slice(1)];
         const last = d[d.length - 1];
@@ -59,12 +56,13 @@ export function LiveDashboardSection() {
     return () => window.clearInterval(id);
   }, []);
 
-  const health = [
-    { name: "Nominal", value: 62 },
-    { name: "Watch", value: 22 },
-    { name: "Derate", value: 10 },
-    { name: "Offline", value: 6 },
-  ];
+  const health = dashboardData
+  ? (Object.entries(dashboardData.severity_breakdown) as [string, number][])
+      .map(([name, value]) => ({
+        name,
+        value,
+      }))
+  : [];
 
   type Alarm = {
     incident_id: string;
@@ -75,10 +73,80 @@ export function LiveDashboardSection() {
 
   const [alarms, setAlarms] = useState<Alarm[]>([]);
 
+  // fetched dashboard data from the backend
+    const fetchDashboard = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/dashboard");
+      const data = await res.json();
+      setDashboardData(data.summary);
+    } catch (err) {
+      console.error("Failed to fetch dashboard:", err);
+    }
+  };
+
+  // fetches incidents data from the backend
+  const fetchIncidents = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/incidents");
+      const data = await res.json();
+      setAlarms(data.incidents);
+    } catch (err) {
+      console.error("Failed to fetch incidents:", err);
+    }
+  };
+
+  // fetches Events data from the backend
+  const fetchEvents = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/events");
+      const data = await res.json();
+
+      const grouped: Record<string, number> = {};
+      const criticalGrouped: Record<string, number> = {};
+
+      data.events.forEach((event: any) => {
+        const time = new Date(event.timestamp)
+          .toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+        grouped[time] = (grouped[time] || 0) + 1;
+
+        if (
+          event.severity === "critical" ||
+          event.severity === "high"
+        ) {
+          criticalGrouped[time] =
+            (criticalGrouped[time] || 0) + 1;
+        }
+      });
+
+      const formatted = Object.entries(grouped).map(
+        ([time, count]) => ({
+          t: time,
+          q: count,
+        })
+      );
+
+      const criticalFormatted = Object.entries(
+        criticalGrouped
+      ).map(([time, count]) => ({
+        t: time,
+        v: count,
+      }));
+
+      setEventTrend(formatted);
+      setCriticalTrend(criticalFormatted);
+    } catch (err) {
+      console.error("Failed to fetch events:", err);
+    }
+  };
+
   useEffect(() => {
-    fetch("http://localhost:5000/api/incidents")
-      .then((res) => res.json())
-      .then((data) => setAlarms(data.incidents));
+    fetchIncidents();
+    fetchDashboard();
+    fetchEvents();
   }, []);
 
   // trigger re-renders so relative times refresh periodically
@@ -158,67 +226,68 @@ export function LiveDashboardSection() {
           <div className="grid gap-4 lg:grid-cols-4">
             <div className="rounded-2xl border border-cyan-500/20 bg-bg-secondary/70 p-4 lg:col-span-1">
               <div className="flex items-center justify-between text-xs text-muted">
-                <span>Reactor skin temp</span>
+                <span>Active Events</span>
                 <Flame className="h-4 w-4 text-electric" />
               </div>
               <p className="mt-3 font-display text-4xl text-electric">
-                {temp.toFixed(1)}
-                <span className="text-base text-muted"> °C</span>
+                {dashboardData?.active_events ?? 0}
+                <span className="text-base text-muted"> events</span>
               </p>
-              <div className="mt-4 h-2 rounded-full bg-bg-primary">
+              {/* <div className="mt-4 h-2 rounded-full bg-bg-primary">
                 <motion.div
                   className="h-full rounded-full bg-gradient-to-r from-electric to-cyan"
                   animate={{ width: `${Math.min(100, (temp / 120) * 100)}%` }}
                 />
-              </div>
+              </div> */}
+              <p className="mt-2 text-xs text-muted">Live system event stream</p>
             </div>
 
             <div className="rounded-2xl border border-cyan-500/20 bg-bg-secondary/70 p-4 lg:col-span-1">
               <div className="flex items-center justify-between text-xs text-muted">
-                <span>Header pressure</span>
+                <span>Open Incidents</span>
                 <Gauge className="h-4 w-4 text-cyan" />
               </div>
               <p className="mt-3 font-display text-4xl text-surface">
-                {pressure.toFixed(2)}
-                <span className="text-base text-muted"> MPa</span>
+                {dashboardData?.open_incidents ?? 0}
+                <span className="text-base text-muted"> active</span>
               </p>
-              <p className="mt-2 text-xs text-muted">Setpoint band ±0.05</p>
+              <p className="mt-2 text-xs text-muted">Requires operator attention</p>
             </div>
 
             <div className="rounded-2xl border border-cyan-500/20 bg-bg-secondary/70 p-4 lg:col-span-1">
               <div className="flex items-center justify-between text-xs text-muted">
-                <span>Flow rate</span>
+                <span>Critical Alerts</span>
                 <Activity className="h-4 w-4 text-success" />
               </div>
               <p className="mt-3 font-display text-4xl text-success">
-                {flow}
-                <span className="text-base text-muted"> m³/h</span>
+                {dashboardData?.severity_breakdown?.critical ?? 0}
+                <span className="text-base text-muted"> critical</span>
               </p>
-              <p className="mt-2 text-xs text-muted">Cascade loop stable</p>
+              <p className="mt-2 text-xs text-muted">High priority failures detected</p>
             </div>
 
             <div className="rounded-2xl border border-cyan-500/20 bg-bg-secondary/70 p-4 lg:col-span-1">
               <div className="flex items-center justify-between text-xs text-muted">
-                <span>Line efficiency</span>
+                <span>Total Incidents</span>
                 <Activity className="h-4 w-4 text-electric" />
               </div>
               <p className="mt-3 font-display text-4xl text-electric">
-                {efficiency.toFixed(1)}
-                <span className="text-base text-muted"> %</span>
+                {dashboardData?.total_incidents ?? 0}
+                <span className="text-base text-muted"> detected</span>
               </p>
-              <p className="mt-2 text-xs text-muted">OEE blended · last 1h</p>
+              <p className="mt-2 text-xs text-muted">AI grouped incident clusters</p>
             </div>
           </div>
 
           <div className="mt-4 grid gap-4 lg:grid-cols-3">
             <div className="lg:col-span-2 rounded-2xl border border-cyan-500/15 bg-bg-secondary/60 p-3">
               <div className="mb-2 flex items-center justify-between px-1 text-xs text-muted">
-                <span>Flow rate trend</span>
+                <span>Event Activity Trend</span>
                 <span className="text-electric">Live</span>
               </div>
               <div className="h-56">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={trendData}>
+                  <AreaChart data={eventTrend}>
                     <defs>
                       <linearGradient id="flowFill" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#00D9FF" stopOpacity={0.45} />
@@ -249,7 +318,7 @@ export function LiveDashboardSection() {
             </div>
 
             <div className="rounded-2xl border border-cyan-500/15 bg-bg-secondary/60 p-4">
-              <p className="text-xs font-semibold text-surface">Machine health</p>
+              <p className="text-xs font-semibold text-surface">System Alert Distribution</p>
               <div className="mt-2 h-44">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
@@ -302,7 +371,11 @@ export function LiveDashboardSection() {
                       <span className="truncate font-medium">{h.name}</span>
                     </span>
                     <span className="shrink-0 tabular-nums font-semibold text-electric">
-                      {h.value}%
+                      {dashboardData
+                        ? Math.round(
+                            (h.value / dashboardData.total_events) * 100
+                          )
+                        : 0}%
                     </span>
                   </div>
                 ))}
@@ -313,15 +386,12 @@ export function LiveDashboardSection() {
           <div className="mt-4 grid gap-4 lg:grid-cols-3">
             <div className="rounded-2xl border border-cyan-500/15 bg-bg-secondary/60 p-3 lg:col-span-2">
               <div className="mb-2 flex items-center justify-between px-1 text-xs text-muted">
-                <span>Vibration envelope</span>
+                <span>Alert Intensity Timeline</span>
               </div>
               <div className="h-44">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={trendData.map((d, i) => ({
-                      ...d,
-                      v: 1.2 + Math.sin(i / 3) * 0.25 + (Math.random() - 0.5) * 0.05,
-                    }))}
+                    data={criticalTrend}
                   >
                     <CartesianGrid strokeDasharray="3 6" stroke="#1f2937" />
                     <XAxis dataKey="t" hide />
@@ -352,13 +422,13 @@ export function LiveDashboardSection() {
                 Alarm feed
               </div>
               <div className="space-y-3">
-                {alarms.map((a) => (
+                {alarms.map((a, index) => (
                   <div
-                    key={a.timestamp + a.incident_title}
+                    key={a.incident_id || index}
                     className={`rounded-xl border px-3 py-2 text-[11px] ${
-                      a.priority === "CRITICAL"
+                      a.priority === "critical"
                         ? "border-danger/50 bg-danger/10 text-danger"
-                        : a.priority === "WARNING"
+                        : a.priority === "warning"
                           ? "border-electric/40 bg-electric/5 text-surface"
                           : "border-cyan-500/20 text-muted"
                     }`}
