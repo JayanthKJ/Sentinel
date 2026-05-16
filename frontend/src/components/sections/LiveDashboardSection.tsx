@@ -18,12 +18,19 @@ import { Activity, BellRing, Flame, Gauge } from "lucide-react";
 
 const pieColors = ["#00D9FF", "#38BDF8", "#10B981", "#64748B"];
 
+const apiUrl = (path: string) => {
+  const base = import.meta.env.VITE_API_BASE_URL;
+  if (base) {
+    return `${base.replace(/\/$/, "")}${path}`;
+  }
+  if (window.location.port === "5173" || window.location.port === "4173") {
+    return `http://localhost:5000${path}`;
+  }
+  return path;
+};
+
 export function LiveDashboardSection() {
-  const [temp, setTemp] = useState(82.4);
-  const [pressure, setPressure] = useState(6.12);
-  const [dashboardData, setDashboardData] = useState<any>(null);
-  const [eventTrend, setEventTrend] = useState<any[]>([]);
-  const [criticalTrend, setCriticalTrend] = useState<any[]>([]);
+  const [dashboardData] = useState<any>(null);
 
   const buildTrend = () =>
     Array.from({ length: 18 }).map((_, i) => ({
@@ -37,8 +44,6 @@ export function LiveDashboardSection() {
 
   useEffect(() => {
     const id = window.setInterval(() => {
-      setTemp((v) => Number((v + (Math.random() - 0.5) * 0.6).toFixed(1)));
-      setPressure((v) => Number((v + (Math.random() - 0.5) * 0.08).toFixed(2)));
       setTrendData((d) => {
         const next = [...d.slice(1)];
         const last = d[d.length - 1];
@@ -235,7 +240,7 @@ export function LiveDashboardSection() {
               </div>
               <div className="h-56">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={eventTrend}>
+                  <AreaChart data={trendData}>
                     <defs>
                       <linearGradient id="flowFill" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#00D9FF" stopOpacity={0.45} />
@@ -339,7 +344,7 @@ export function LiveDashboardSection() {
               <div className="h-44">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart
-                    data={criticalTrend}
+                    data={trendData}
                   >
                     <CartesianGrid strokeDasharray="3 6" stroke="#1f2937" />
                     <XAxis dataKey="t" hide />
