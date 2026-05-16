@@ -7,12 +7,12 @@ import { AIGeneratorSection } from "./components/sections/AIGeneratorSection";
 import { FeaturesSection } from "./components/sections/FeaturesSection";
 import { LiveDashboardSection } from "./components/sections/LiveDashboardSection";
 import { DigitalTwinSection } from "./components/sections/DigitalTwinSection";
-import { VoiceAssistantSection } from "./components/sections/VoiceAssistantSection";
-import { SimulationSection } from "./components/sections/SimulationSection";
+// import { VoiceAssistantSection } from "./components/sections/VoiceAssistantSection";
 import { OutputSection } from "./components/sections/OutputSection";
 import { TeamSection } from "./components/sections/TeamSection";
 import { ContactSection } from "./components/sections/ContactSection";
 import { ScrollToHomeButton } from "./components/ScrollToHomeButton";
+import { FloatingAIBot } from "./components/FloatingAIBot";
 
 export default function App() {
   useLenis();
@@ -35,12 +35,12 @@ export default function App() {
           <FeaturesSection />
           <LiveDashboardSection />
           <DigitalTwinSection />
-          <VoiceAssistantSection />
-          <SimulationSection />
+          {/* <VoiceAssistantSection /> */}
           <OutputSection />
           <TeamSection />
           <ContactSection />
         </main>
+        <FloatingAIBot />
         <ScrollToHomeButton />
       </motion.div>
     </AnimatePresence>

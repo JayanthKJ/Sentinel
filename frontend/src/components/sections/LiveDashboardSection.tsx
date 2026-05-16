@@ -30,7 +30,7 @@ const apiUrl = (path: string) => {
 };
 
 export function LiveDashboardSection() {
-  const [dashboardData] = useState<any>(null);
+  const [dashboardData, setDashboardData] = useState<any>(null);
 
   const buildTrend = () =>
     Array.from({ length: 18 }).map((_, i) => ({
@@ -82,30 +82,30 @@ export function LiveDashboardSection() {
     setTrendData(buildTrend());
     setLastGraphRefresh(new Date().toLocaleTimeString());
 
-    fetch(apiUrl("/api/incidents"))
-      .then((res) => res.json())
-      .then((data) => setAlarms(data.incidents))
+    Promise.all([fetch(apiUrl("/api/incidents")), fetch(apiUrl("/api/dashboard"))])
+      .then(async ([incidentsRes, dashboardRes]) => {
+        const incidentsData = await incidentsRes.json();
+        const dashboardJson = await dashboardRes.json();
+
+        setAlarms(incidentsData?.incidents ?? []);
+        setDashboardData(dashboardJson?.summary ?? null);
+      })
       .catch(() => {
-        // Keep the existing graph visible even if the alarm feed refresh fails.
+        // Keep existing data visible even if refresh fails.
       });
   };
 
-  useEffect(() => {
-    fetch(apiUrl("/api/incidents"))
-      .then((res) => res.json())
-      .then((data) => setAlarms(data.incidents));
-  }, []);
 
   useEffect(() => {
     refreshGraphData();
-    const id = window.setInterval(refreshGraphData, 30000);
+    const id = window.setInterval(refreshGraphData, 5000);
     return () => window.clearInterval(id);
   }, []);
 
   // trigger re-renders so relative times refresh periodically
   const [, setTick] = useState(0);
   useEffect(() => {
-    const id = window.setInterval(() => setTick(Date.now()), 30000);
+    const id = window.setInterval(() => setTick(Date.now()), 5000);
     return () => window.clearInterval(id);
   }, []);
 
@@ -377,7 +377,7 @@ export function LiveDashboardSection() {
               <p className="mb-3 text-[10px] uppercase tracking-[0.25em] text-muted">
                 {lastGraphRefresh
                   ? `Auto-refreshed at ${lastGraphRefresh}`
-                  : "Auto-refresh active every 30 seconds"}
+                  : "Auto-refresh active every 5 seconds"}
               </p>
               <div className="space-y-3">
                 {alarms.map((a, index) => (

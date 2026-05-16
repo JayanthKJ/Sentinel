@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { useRef, useState } from "react";
+import { ArrowRight, Loader2, Play, RotateCcw, Sparkles } from "lucide-react";
 import { Hero3D } from "./Hero3D";
 import { ParticleField } from "../ParticleField";
 import { CircuitBackdrop } from "../CircuitBackdrop";
@@ -13,6 +13,8 @@ type Props = {
 
 export function HeroSection({ activeSection }: Props) {
   const ref = useRef<HTMLElement>(null);
+  const [running, setRunning] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
@@ -22,6 +24,50 @@ export function HeroSection({ activeSection }: Props) {
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const apiUrl = (path: string) => {
+    const base = import.meta.env.VITE_API_BASE_URL;
+
+    if (base) {
+      return `${base.replace(/\/$/, "")}${path}`;
+    }
+
+    if (window.location.port === "5173" || window.location.port === "4173") {
+      return `http://localhost:5000${path}`;
+    }
+
+    return path;
+  };
+
+  const runSimulation = async () => {
+    try {
+      setRunning(true);
+      await fetch(apiUrl("/api/simulate"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ count: 10 }),
+      });
+      // Scroll to live demo incidents section
+      setTimeout(() => {
+        document.getElementById("live-demo")?.scrollIntoView({ behavior: "smooth" });
+      }, 500);
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  const resetSimulation = async () => {
+    try {
+      setResetting(true);
+      await fetch(apiUrl("/api/reset"), {
+        method: "POST",
+      });
+    } finally {
+      setResetting(false);
+    }
   };
 
   return (
@@ -143,6 +189,42 @@ export function HeroSection({ activeSection }: Props) {
               Explore Features
             </motion.button>
           </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0, duration: 0.65 }}
+            className="mt-20 max-w-xl rounded-3xl border border-electric/35 bg-[linear-gradient(135deg,rgba(0,217,255,0.14),rgba(2,6,23,0.72))] p-4 shadow-[0_0_40px_rgba(0,217,255,0.22)] backdrop-blur-xl"
+          >
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-electric/85">
+              Simulator controls
+            </p>
+            <div className="flex flex-wrap items-center justify-start gap-3">
+              <motion.button
+                type="button"
+                onClick={runSimulation}
+                whileHover={{ scale: 1.05, boxShadow: "0 0 36px rgba(0,217,255,0.45)" }}
+                whileTap={{ scale: 0.97 }}
+                disabled={running || resetting}
+                className="inline-flex items-center gap-2 rounded-2xl border border-cyan-300/50 bg-gradient-to-r from-electric to-cyan px-7 py-4 text-sm font-bold uppercase tracking-wide text-bg-primary shadow-neon transition disabled:cursor-not-allowed disabled:opacity-60 md:px-8 md:py-4 md:text-base"
+              >
+                {running ? <Loader2 className="h-5 w-5 animate-spin" /> : <Play className="h-5 w-5" />}
+                {running ? "Running simulator" : "Run simulator"}
+              </motion.button>
+
+              <motion.button
+                type="button"
+                onClick={resetSimulation}
+                whileHover={{ scale: 1.04, boxShadow: "0 0 28px rgba(56,189,248,0.3)" }}
+                whileTap={{ scale: 0.97 }}
+                disabled={running || resetting}
+                className="inline-flex items-center gap-2 rounded-2xl border border-cyan-500/40 bg-[rgba(8,47,73,0.45)] px-7 py-4 text-sm font-bold uppercase tracking-wide text-cyan-100 backdrop-blur-xl transition hover:border-electric/70 hover:text-surface disabled:cursor-not-allowed disabled:opacity-60 md:px-8 md:py-4 md:text-base"
+              >
+                {resetting ? <Loader2 className="h-5 w-5 animate-spin" /> : <RotateCcw className="h-5 w-5" />}
+                Reset
+              </motion.button>
+            </div>
+          </motion.div>
         </div>
 
         <motion.div
@@ -152,7 +234,7 @@ export function HeroSection({ activeSection }: Props) {
           style={{ perspective: 1200 }}
           className="order-2 flex flex-col items-center justify-center lg:order-none lg:items-end"
         >
-          <div className="glass-panel neon-border relative w-full max-w-[540px] rounded-2xl p-4 md:p-5 lg:rounded-3xl">
+          <div className="neon-border relative w-full max-w-[540px] rounded-2xl bg-[rgba(2,6,23,0.35)] p-4 md:p-5 lg:rounded-3xl">
             <div className="absolute -left-6 -top-6 h-24 w-24 rounded-full bg-electric/20 blur-3xl" />
             <div className="absolute -bottom-10 -right-10 h-32 w-32 rounded-full bg-cyan/25 blur-3xl" />
             <motion.div
@@ -165,6 +247,7 @@ export function HeroSection({ activeSection }: Props) {
               Live neural mesh preview
             </p>
           </div>
+
         </motion.div>
 
         <HeroNavigateDeck

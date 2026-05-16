@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Activity,
   AlertTriangle,
@@ -35,6 +35,7 @@ export function OutputSection() {
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const summaryPanelRef = useRef<HTMLDivElement>(null);
 
   const apiUrl = (path: string) => {
     const base = import.meta.env.VITE_API_BASE_URL;
@@ -99,6 +100,7 @@ export function OutputSection() {
       }
 
       await fetchSummary();
+      summaryPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to analyze logs");
     } finally {
@@ -173,7 +175,7 @@ export function OutputSection() {
           </p>
         </motion.div>
 
-        <div className="mt-10 flex flex-wrap justify-center gap-3">
+        <div className="mt-12 flex flex-wrap justify-center gap-4">
           <motion.button
             type="button"
             onClick={analyzeLogs}
@@ -191,7 +193,6 @@ export function OutputSection() {
             onClick={refreshSummary}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
-            disabled={loading}
             className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-[rgba(15,23,42,0.8)] px-5 py-3 text-xs font-semibold uppercase tracking-wide text-muted backdrop-blur-xl transition hover:text-surface disabled:cursor-not-allowed disabled:opacity-60 md:text-sm"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
@@ -209,7 +210,7 @@ export function OutputSection() {
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
-          className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-4"
+          className="mt-14 grid gap-4 md:grid-cols-2 xl:grid-cols-4"
         >
           {cards.map((card) => {
             const Icon = card.icon;
@@ -232,10 +233,11 @@ export function OutputSection() {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
           <motion.div
+            ref={summaryPanelRef}
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-60px" }}
-            className="glass-panel neon-border rounded-3xl p-5 md:p-6"
+            className="glass-panel neon-border scroll-mt-32 rounded-3xl p-5 md:p-6"
           >
             <div className="flex items-center justify-between gap-3">
               <div>

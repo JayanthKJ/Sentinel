@@ -1,192 +1,130 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import {
-  Float,
-  MeshDistortMaterial,
-  PerspectiveCamera,
-  Sparkles,
-} from "@react-three/drei";
+import { Float, PerspectiveCamera, Sparkles } from "@react-three/drei";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
-import type { Group, Mesh, Points } from "three";
+import type { Group, InstancedMesh } from "three";
 
-function NeuralPointField() {
-  const points = useRef<Points>(null);
-  const geo = useMemo(() => {
-    const count = 120;
-    const positions = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      const u = Math.random();
-      const v = Math.random();
-      const theta = u * Math.PI * 2;
-      const phi = Math.acos(2 * v - 1);
-      const r = 1.35 + (Math.random() - 0.5) * 0.45;
-      const sinPhi = Math.sin(phi);
-      positions[i * 3] = r * sinPhi * Math.cos(theta);
-      positions[i * 3 + 1] = r * sinPhi * Math.sin(theta);
-      positions[i * 3 + 2] = r * Math.cos(phi);
-    }
-    const g = new THREE.BufferGeometry();
-    g.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    return g;
-  }, []);
-
-  useFrame((state) => {
-    if (!points.current) return;
-    points.current.rotation.y = state.clock.elapsedTime * 0.12;
-    points.current.rotation.x =
-      Math.sin(state.clock.elapsedTime * 0.25) * 0.08;
-  });
-
-  return (
-    <points ref={points} geometry={geo}>
-      <pointsMaterial
-        color="#00D9FF"
-        size={0.045}
-        transparent
-        opacity={0.9}
-        sizeAttenuation
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
-    </points>
+function LogColumns() {
+  const mesh = useRef<InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const columns = useMemo(
+    () =>
+      Array.from({ length: 32 }).map((_, i) => {
+        const col = i % 8;
+        const row = Math.floor(i / 8);
+        return {
+          x: (col - 3.5) * 0.26,
+          z: (row - 1.5) * 0.22,
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.7 + Math.random() * 0.8,
+        };
+      }),
+    []
   );
-}
 
-function WireframeShell() {
-  const mesh = useRef<Mesh>(null);
   useFrame((state) => {
     if (!mesh.current) return;
-    mesh.current.rotation.y = -state.clock.elapsedTime * 0.22;
-    mesh.current.rotation.x =
-      state.clock.elapsedTime * 0.11 + Math.sin(state.clock.elapsedTime * 0.35) * 0.06;
+    const t = state.clock.elapsedTime;
+
+    for (let i = 0; i < columns.length; i++) {
+      const c = columns[i];
+      const h = 0.14 + Math.abs(Math.sin(t * c.speed + c.phase)) * 1.2;
+      dummy.position.set(c.x, -0.9 + h * 0.5, c.z);
+      dummy.scale.set(0.08, h, 0.08);
+      dummy.updateMatrix();
+      mesh.current.setMatrixAt(i, dummy.matrix);
+    }
+
+    mesh.current.instanceMatrix.needsUpdate = true;
   });
+
   return (
-    <mesh ref={mesh} scale={1.42}>
-      <icosahedronGeometry args={[1, 2]} />
-      <meshBasicMaterial
-        color="#38BDF8"
-        wireframe
+    <instancedMesh ref={mesh} args={[undefined, undefined, columns.length]}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial
+        color="#00D9FF"
+        emissive="#38BDF8"
+        emissiveIntensity={0.65}
+        metalness={0.25}
+        roughness={0.35}
         transparent
-        opacity={0.18}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
+        opacity={0.9}
       />
-    </mesh>
+    </instancedMesh>
   );
 }
 
-function EnergyRings() {
+function TerminalLayers() {
   const group = useRef<Group>(null);
+
   useFrame((state) => {
     if (!group.current) return;
-    group.current.rotation.z = state.clock.elapsedTime * 0.38;
-    group.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.2) * 0.15;
+    const t = state.clock.elapsedTime;
+    group.current.rotation.y = Math.sin(t * 0.22) * 0.08;
+    group.current.position.y = Math.sin(t * 0.5) * 0.05;
   });
+
   return (
     <group ref={group}>
-      <mesh rotation={[1.1, 0.4, 0.2]}>
-        <torusGeometry args={[1.58, 0.018, 12, 160]} />
-        <meshBasicMaterial
-          color="#00D9FF"
+      <mesh position={[0, 0.25, -0.35]} rotation={[-0.35, 0.2, 0]}>
+        <boxGeometry args={[2.5, 0.05, 1.55]} />
+        <meshStandardMaterial
+          color="#0ea5e9"
+          emissive="#0284c7"
+          emissiveIntensity={0.4}
+          metalness={0.2}
+          roughness={0.4}
           transparent
-          opacity={0.55}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
+          opacity={0.38}
         />
       </mesh>
-      <mesh rotation={[0.5, 2.1, 0.35]}>
-        <torusGeometry args={[1.78, 0.012, 10, 120]} />
-        <meshBasicMaterial
-          color="#38BDF8"
+      <mesh position={[0.15, -0.05, -0.25]} rotation={[-0.35, 0.2, 0]}>
+        <boxGeometry args={[2.2, 0.05, 1.45]} />
+        <meshStandardMaterial
+          color="#22d3ee"
+          emissive="#06b6d4"
+          emissiveIntensity={0.35}
+          metalness={0.2}
+          roughness={0.45}
           transparent
-          opacity={0.35}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
+          opacity={0.32}
         />
+      </mesh>
+      <mesh position={[-0.1, -0.33, -0.15]} rotation={[-0.35, 0.2, 0]}>
+        <boxGeometry args={[1.9, 0.05, 1.25]} />
+        <meshStandardMaterial
+          color="#67e8f9"
+          emissive="#22d3ee"
+          emissiveIntensity={0.25}
+          metalness={0.18}
+          roughness={0.48}
+          transparent
+          opacity={0.28}
+        />
+      </mesh>
+      <mesh position={[0, -1.0, 0]} rotation={[-0.35, 0.2, 0]}>
+        <boxGeometry args={[2.9, 0.04, 1.9]} />
+        <meshBasicMaterial color="#38bdf8" transparent opacity={0.18} />
       </mesh>
     </group>
   );
 }
 
-function HologramCore() {
-  const mesh = useRef<Mesh>(null);
-  useFrame((state) => {
-    if (!mesh.current) return;
-    const t = state.clock.elapsedTime;
-    mesh.current.rotation.x = t * 0.38 + Math.sin(t * 0.45) * 0.1;
-    mesh.current.rotation.y = t * 0.52;
-    mesh.current.rotation.z = Math.sin(t * 0.2) * 0.05;
-  });
-  return (
-    <Float speed={2.4} rotationIntensity={0.42} floatIntensity={0.72}>
-      <mesh ref={mesh} scale={1.12}>
-        <icosahedronGeometry args={[1, 2]} />
-        <MeshDistortMaterial
-          color="#00D9FF"
-          emissive="#38BDF8"
-          emissiveIntensity={1.05}
-          roughness={0.12}
-          metalness={0.92}
-          distort={0.42}
-          speed={2.4}
-        />
-      </mesh>
-    </Float>
-  );
-}
-
-function InnerGlow() {
-  const mesh = useRef<Mesh>(null);
-  useFrame((state) => {
-    if (!mesh.current) return;
-    const p = 0.92 + Math.sin(state.clock.elapsedTime * 1.8) * 0.04;
-    mesh.current.scale.setScalar(p);
-  });
-  return (
-    <mesh ref={mesh} scale={0.78}>
-      <icosahedronGeometry args={[1, 1]} />
-      <meshBasicMaterial
-        color="#00D9FF"
-        transparent
-        opacity={0.12}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
-    </mesh>
-  );
-}
-
 function SceneRig() {
-  const group = useRef<Group>(null);
-  useFrame((state) => {
-    if (!group.current) return;
-    const t = state.clock.elapsedTime;
-    group.current.rotation.y = Math.sin(t * 0.15) * 0.06;
-    group.current.rotation.x = Math.cos(t * 0.12) * 0.04;
-  });
   return (
-    <group ref={group}>
+    <group>
       <Sparkles
-        count={48}
-        scale={5.2}
-        size={2.2}
-        speed={0.35}
-        opacity={0.55}
+        count={36}
+        scale={4.2}
+        size={2.4}
+        speed={0.4}
+        opacity={0.5}
         color="#38BDF8"
       />
-      <Sparkles
-        count={28}
-        scale={3.8}
-        size={1.6}
-        speed={0.55}
-        opacity={0.45}
-        color="#00D9FF"
-      />
-      <NeuralPointField />
-      <EnergyRings />
-      <WireframeShell />
-      <InnerGlow />
-      <HologramCore />
+      <Float speed={1.9} rotationIntensity={0.18} floatIntensity={0.4}>
+        <TerminalLayers />
+      </Float>
+      <LogColumns />
     </group>
   );
 }
@@ -195,27 +133,30 @@ export function Hero3D() {
   return (
     <div className="relative h-[min(54vh,440px)] w-full max-w-[540px] md:h-[min(62vh,520px)]">
       <Canvas
+        className="!bg-transparent"
         dpr={[1, 2]}
         gl={{
           alpha: true,
           antialias: true,
           powerPreference: "high-performance",
         }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(new THREE.Color("#020617"), 0);
+        }}
       >
-        <color attach="background" args={["transparent"]} />
-        <PerspectiveCamera makeDefault position={[0, 0, 4.35]} fov={42} />
-        <ambientLight intensity={0.22} />
-        <pointLight position={[4.5, 3.5, 5]} intensity={2.2} color="#00D9FF" />
-        <pointLight position={[-4.5, -2.5, -3.5]} intensity={1.1} color="#38BDF8" />
+        <PerspectiveCamera makeDefault position={[0, 0.1, 4.5]} fov={40} />
+        <ambientLight intensity={0.28} />
+        <pointLight position={[4.2, 3.2, 4.5]} intensity={1.65} color="#00D9FF" />
+        <pointLight position={[-3.8, -2.5, -2.8]} intensity={0.85} color="#38BDF8" />
         <spotLight
-          position={[0, 5, 2]}
-          angle={0.45}
-          penumbra={0.85}
-          intensity={1.4}
-          color="#F8FAFC"
+          position={[0, 4.2, 2.2]}
+          angle={0.42}
+          penumbra={0.8}
+          intensity={1.1}
+          color="#7DD3FC"
           castShadow={false}
         />
-        <directionalLight position={[2, 1, 5]} intensity={0.35} color="#94A3B8" />
+        <directionalLight position={[2.2, 1.1, 4.8]} intensity={0.28} color="#94A3B8" />
         <SceneRig />
       </Canvas>
       <div className="pointer-events-none absolute inset-0 rounded-full bg-[radial-gradient(circle_at_center,rgba(0,217,255,0.28),transparent_58%)] blur-2xl" />
