@@ -24,14 +24,13 @@ export function LiveDashboardSection() {
   const [flow, setFlow] = useState(128);
   const [efficiency, setEfficiency] = useState(93.2);
 
-  const trend = useMemo(
-    () =>
-      Array.from({ length: 18 }).map((_, i) => ({
-        t: `${i * 2}s`,
-        q: 110 + Math.sin(i / 2) * 14 + i * 0.4,
-      })),
-    []
-  );
+  const buildTrend = () =>
+    Array.from({ length: 18 }).map((_, i) => ({
+      t: `${i * 2}s`,
+      q: 110 + Math.sin(i / 2) * 14 + i * 0.4,
+    }));
+
+  const trend = useMemo(() => buildTrend(), []);
 
   const [trendData, setTrendData] = useState(trend);
 
@@ -74,11 +73,30 @@ export function LiveDashboardSection() {
   };
 
   const [alarms, setAlarms] = useState<Alarm[]>([]);
+  const [lastGraphRefresh, setLastGraphRefresh] = useState<string | null>(null);
+
+  const refreshGraphData = () => {
+    setTrendData(buildTrend());
+    setLastGraphRefresh(new Date().toLocaleTimeString());
+
+    fetch(apiUrl("/api/incidents"))
+      .then((res) => res.json())
+      .then((data) => setAlarms(data.incidents))
+      .catch(() => {
+        // Keep the existing graph visible even if the alarm feed refresh fails.
+      });
+  };
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/incidents")
+    fetch(apiUrl("/api/incidents"))
       .then((res) => res.json())
       .then((data) => setAlarms(data.incidents));
+  }, []);
+
+  useEffect(() => {
+    refreshGraphData();
+    const id = window.setInterval(refreshGraphData, 30000);
+    return () => window.clearInterval(id);
   }, []);
 
   // trigger re-renders so relative times refresh periodically
@@ -351,6 +369,11 @@ export function LiveDashboardSection() {
                 <BellRing className="h-4 w-4 text-electric" />
                 Alarm feed
               </div>
+              <p className="mb-3 text-[10px] uppercase tracking-[0.25em] text-muted">
+                {lastGraphRefresh
+                  ? `Auto-refreshed at ${lastGraphRefresh}`
+                  : "Auto-refresh active every 30 seconds"}
+              </p>
               <div className="space-y-3">
                 {alarms.map((a) => (
                   <div

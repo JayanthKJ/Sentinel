@@ -1,6 +1,15 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { createElement, useState } from "react";
-import { AlertOctagon, Flame, PlugZap, Gauge, Power, Loader2, Play } from "lucide-react";
+import {
+  AlertOctagon,
+  Flame,
+  Gauge,
+  Loader2,
+  Play,
+  PlugZap,
+  Power,
+  RotateCcw,
+} from "lucide-react";
 
 type Scenario = {
   key: string;
@@ -66,6 +75,12 @@ export function SimulationSection() {
     setOpen(s);
     setFlash(true);
     window.setTimeout(() => setFlash(false), 420);
+  };
+
+  const resetSimulation = () => {
+    setOpen(null);
+    setFlash(false);
+    setStatus(null);
   };
 
   const runSimulation = async () => {
@@ -135,37 +150,53 @@ export function SimulationSection() {
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-12 flex flex-wrap items-center justify-center gap-3"
+          className="mt-12 grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start"
         >
-          <motion.button
-            type="button"
-            onClick={runSimulation}
-            whileHover={{ scale: 1.04, boxShadow: "0 0 28px rgba(0,217,255,0.35)" }}
-            whileTap={{ scale: 0.97 }}
-            disabled={running}
-            className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-[rgba(14,22,38,0.85)] px-5 py-3 text-xs font-semibold uppercase tracking-wide text-electric backdrop-blur-xl transition disabled:cursor-not-allowed disabled:opacity-60 md:text-sm"
-          >
-            {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-            {running ? "Running simulation" : "Run simulation"}
-          </motion.button>
-          {[
-            { label: "Trigger Fire", s: SCENARIOS[0] },
-            { label: "Pump Failure", s: SCENARIOS[1] },
-            { label: "Sensor Disconnect", s: SCENARIOS[2] },
-            { label: "Pressure Spike", s: SCENARIOS[3] },
-            { label: "Emergency Shutdown", s: SCENARIOS[4] },
-          ].map((b) => (
+          <div className="order-2 flex flex-wrap items-center justify-center gap-3 lg:order-1 lg:justify-start">
+            {[
+              { label: "Trigger Fire", s: SCENARIOS[0] },
+              { label: "Pump Failure", s: SCENARIOS[1] },
+              { label: "Sensor Disconnect", s: SCENARIOS[2] },
+              { label: "Pressure Spike", s: SCENARIOS[3] },
+              { label: "Emergency Shutdown", s: SCENARIOS[4] },
+            ].map((b) => (
+              <motion.button
+                key={b.label}
+                type="button"
+                onClick={() => trigger(b.s)}
+                whileHover={{ scale: 1.04, boxShadow: "0 0 28px rgba(239,68,68,0.45)" }}
+                whileTap={{ scale: 0.97 }}
+                className="rounded-full border border-danger/50 bg-[rgba(30,41,59,0.75)] px-5 py-3 text-xs font-semibold uppercase tracking-wide text-danger backdrop-blur-xl md:text-sm"
+              >
+                {b.label}
+              </motion.button>
+            ))}
+          </div>
+
+          <div className="order-1 flex flex-wrap items-center justify-center gap-3 lg:order-2 lg:justify-end lg:justify-self-end">
             <motion.button
-              key={b.label}
               type="button"
-              onClick={() => trigger(b.s)}
-              whileHover={{ scale: 1.04, boxShadow: "0 0 28px rgba(239,68,68,0.45)" }}
+              onClick={runSimulation}
+              whileHover={{ scale: 1.04, boxShadow: "0 0 28px rgba(0,217,255,0.35)" }}
               whileTap={{ scale: 0.97 }}
-              className="rounded-full border border-danger/50 bg-[rgba(30,41,59,0.75)] px-5 py-3 text-xs font-semibold uppercase tracking-wide text-danger backdrop-blur-xl md:text-sm"
+              disabled={running}
+              className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 bg-[rgba(14,22,38,0.85)] px-5 py-3 text-xs font-semibold uppercase tracking-wide text-electric backdrop-blur-xl transition disabled:cursor-not-allowed disabled:opacity-60 md:text-sm"
             >
-              {b.label}
+              {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+              {running ? "Running simulator" : "Run simulator"}
             </motion.button>
-          ))}
+
+            <motion.button
+              type="button"
+              onClick={resetSimulation}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-[rgba(15,23,42,0.8)] px-5 py-3 text-xs font-semibold uppercase tracking-wide text-muted backdrop-blur-xl transition hover:text-surface md:text-sm"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset
+            </motion.button>
+          </div>
         </motion.div>
 
         {status && (

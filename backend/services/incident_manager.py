@@ -38,6 +38,8 @@ class IncidentManager:
             "time_window": 600  # 10 minutes
         }
     }
+
+    MAX_INCIDENT_HISTORY = 10
     
     def __init__(self):
         self.incidents: List[Incident] = []
@@ -145,12 +147,28 @@ class IncidentManager:
         )
         
         self.incidents.append(incident)
+        self._prune_incidents()
         
         # Map events to this incident
         for event in events:
             self.event_to_incident_map[event.event_id] = incident.incident_id
         
         return incident
+
+    def _prune_incidents(self):
+        """Keep only the newest incidents in memory."""
+        if len(self.incidents) <= self.MAX_INCIDENT_HISTORY:
+            return
+
+        stale_incidents = self.incidents[:-self.MAX_INCIDENT_HISTORY]
+        stale_ids = {incident.incident_id for incident in stale_incidents}
+
+        self.incidents = self.incidents[-self.MAX_INCIDENT_HISTORY:]
+        self.event_to_incident_map = {
+            event_id: incident_id
+            for event_id, incident_id in self.event_to_incident_map.items()
+            if incident_id not in stale_ids
+        }
     
     def _calculate_priority(self, events: List[Event]) -> str:
         """
