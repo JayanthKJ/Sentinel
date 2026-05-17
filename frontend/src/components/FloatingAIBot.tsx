@@ -23,7 +23,7 @@ export function FloatingAIBot() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.92 }}
           transition={{ duration: 0.35, ease: "easeOut" }}
-          className="fixed bottom-20 right-5 z-[75] md:bottom-24 md:right-7"
+          className="fixed bottom-16 right-4 z-[75] md:bottom-20 md:right-6"
         >
           <motion.button
             type="button"
@@ -35,28 +35,28 @@ export function FloatingAIBot() {
           >
             <div className="absolute inset-0 -z-10 rounded-full bg-[radial-gradient(circle,rgba(0,217,255,0.35),transparent_68%)] blur-xl" />
 
-            <div className="relative h-[92px] w-[76px] rounded-[30px] border border-cyan-300/45 bg-[linear-gradient(165deg,rgba(56,189,248,0.92),rgba(2,6,23,0.88))] shadow-[0_0_32px_rgba(0,217,255,0.28)]">
-              <div className="absolute left-1/2 top-[-9px] h-4 w-4 -translate-x-1/2 rounded-full border border-cyan-300/50 bg-electric/65" />
-              <div className="absolute inset-x-2 top-3 rounded-2xl border border-cyan-300/30 bg-[rgba(2,6,23,0.75)] px-1.5 py-1.5">
+            <div className="relative h-[76px] w-[62px] rounded-[24px] border border-cyan-300/45 bg-[linear-gradient(165deg,rgba(56,189,248,0.92),rgba(2,6,23,0.88))] shadow-[0_0_24px_rgba(0,217,255,0.28)]">
+              <div className="absolute left-1/2 top-[-7px] h-3 w-3 -translate-x-1/2 rounded-full border border-cyan-300/50 bg-electric/65" />
+              <div className="absolute inset-x-1.5 top-2.5 rounded-xl border border-cyan-300/30 bg-[rgba(2,6,23,0.75)] px-1 py-1">
                 <div className="flex items-center justify-between px-1">
-                  <div className="h-2.5 w-2.5 rounded-full bg-cyan-200 shadow-[0_0_8px_rgba(56,189,248,0.9)]" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-cyan-200 shadow-[0_0_8px_rgba(56,189,248,0.9)]" />
+                  <div className="h-2 w-2 rounded-full bg-cyan-200 shadow-[0_0_8px_rgba(56,189,248,0.9)]" />
+                  <div className="h-2 w-2 rounded-full bg-cyan-200 shadow-[0_0_8px_rgba(56,189,248,0.9)]" />
                 </div>
-                <div className="mx-auto mt-1.5 h-1 w-7 rounded-full bg-cyan-300/70" />
+                <div className="mx-auto mt-1 h-1 w-5 rounded-full bg-cyan-300/70" />
               </div>
 
-              <div className="absolute -left-2 top-[38px] h-7 w-3 rounded-full border border-cyan-300/35 bg-cyan-500/35" />
-              <div className="absolute -right-2 top-[38px] h-7 w-3 rounded-full border border-cyan-300/35 bg-cyan-500/35" />
+              <div className="absolute -left-1.5 top-[31px] h-6 w-2.5 rounded-full border border-cyan-300/35 bg-cyan-500/35" />
+              <div className="absolute -right-1.5 top-[31px] h-6 w-2.5 rounded-full border border-cyan-300/35 bg-cyan-500/35" />
 
               <motion.div
                 animate={{ opacity: [0.4, 1, 0.4], scale: [0.9, 1.1, 0.9] }}
                 transition={{ duration: 1.6, repeat: Infinity }}
-                className="absolute -right-2 -top-2 rounded-full border border-electric/60 bg-[rgba(2,6,23,0.86)] p-1.5 text-electric"
+                className="absolute -right-1.5 -top-1.5 rounded-full border border-electric/60 bg-[rgba(2,6,23,0.86)] p-1 text-electric"
               >
-                <Sparkles className="h-3.5 w-3.5" />
+                <Sparkles className="h-3 w-3" />
               </motion.div>
             </div>
-            <p className="mt-1 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-electric/90">
+            <p className="mt-1 text-center text-[9px] font-semibold uppercase tracking-[0.18em] text-electric/90">
               AI Summary
             </p>
           </motion.button>

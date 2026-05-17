@@ -6,11 +6,11 @@ import { ProblemSection } from "./components/sections/ProblemSection";
 import { AIGeneratorSection } from "./components/sections/AIGeneratorSection";
 import { FeaturesSection } from "./components/sections/FeaturesSection";
 import { LiveDashboardSection } from "./components/sections/LiveDashboardSection";
-import { DigitalTwinSection } from "./components/sections/DigitalTwinSection";
 // import { VoiceAssistantSection } from "./components/sections/VoiceAssistantSection";
 import { OutputSection } from "./components/sections/OutputSection";
 import { TeamSection } from "./components/sections/TeamSection";
 import { ContactSection } from "./components/sections/ContactSection";
+import { HeroNavigateDeck } from "./components/HeroNavigateDeck";
 import { ScrollToHomeButton } from "./components/ScrollToHomeButton";
 import { FloatingAIBot } from "./components/FloatingAIBot";
 
@@ -28,13 +28,14 @@ export default function App() {
         transition={{ duration: 0.5 }}
         className="relative min-h-screen bg-bg-primary text-surface"
       >
+        <HeroNavigateDeck active={active} />
+        <div className="h-16 md:h-20" aria-hidden="true" />
         <main>
-          <HeroSection activeSection={active} />
+          <HeroSection />
           <ProblemSection />
           <AIGeneratorSection />
           <FeaturesSection />
           <LiveDashboardSection />
-          <DigitalTwinSection />
           {/* <VoiceAssistantSection /> */}
           <OutputSection />
           <TeamSection />

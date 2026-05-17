@@ -4,14 +4,8 @@ import { ArrowRight, Loader2, Play, RotateCcw, Sparkles } from "lucide-react";
 import { Hero3D } from "./Hero3D";
 import { ParticleField } from "../ParticleField";
 import { CircuitBackdrop } from "../CircuitBackdrop";
-import { HeroNavigateDeck } from "../HeroNavigateDeck";
-import type { SectionId } from "../../constants/sections";
 
-type Props = {
-  activeSection: SectionId;
-};
-
-export function HeroSection({ activeSection }: Props) {
+export function HeroSection() {
   const ref = useRef<HTMLElement>(null);
   const [running, setRunning] = useState(false);
   const [resetting, setResetting] = useState(false);
@@ -194,34 +188,48 @@ export function HeroSection({ activeSection }: Props) {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.0, duration: 0.65 }}
-            className="mt-20 max-w-xl rounded-3xl border border-electric/35 bg-[linear-gradient(135deg,rgba(0,217,255,0.14),rgba(2,6,23,0.72))] p-4 shadow-[0_0_40px_rgba(0,217,255,0.22)] backdrop-blur-xl"
+            className="mt-20 max-w-xl"
           >
-            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-electric/85">
+            <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.28em] text-electric/85">
               Simulator controls
             </p>
             <div className="flex flex-wrap items-center justify-start gap-3">
               <motion.button
                 type="button"
                 onClick={runSimulation}
-                whileHover={{ scale: 1.05, boxShadow: "0 0 36px rgba(0,217,255,0.45)" }}
+                whileHover={{ y: -3, scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 disabled={running || resetting}
-                className="inline-flex items-center gap-2 rounded-2xl border border-cyan-300/50 bg-gradient-to-r from-electric to-cyan px-7 py-4 text-sm font-bold uppercase tracking-wide text-bg-primary shadow-neon transition disabled:cursor-not-allowed disabled:opacity-60 md:px-8 md:py-4 md:text-base"
+                className="group inline-flex items-center gap-3 rounded-full border border-electric/45 bg-[linear-gradient(140deg,rgba(0,217,255,0.2),rgba(2,6,23,0.78))] px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-surface shadow-[0_0_24px_rgba(0,217,255,0.2)] backdrop-blur-xl transition hover:border-electric/80 hover:text-electric disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {running ? <Loader2 className="h-5 w-5 animate-spin" /> : <Play className="h-5 w-5" />}
-                {running ? "Running simulator" : "Run simulator"}
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-electric/60 bg-electric/15">
+                  {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                </span>
+                <span className="flex flex-col items-start leading-tight">
+                  <span>{running ? "Running" : "Run"}</span>
+                  <span className="text-[9px] font-medium uppercase tracking-[0.18em] text-muted group-hover:text-electric/80">
+                    Simulator
+                  </span>
+                </span>
               </motion.button>
 
               <motion.button
                 type="button"
                 onClick={resetSimulation}
-                whileHover={{ scale: 1.04, boxShadow: "0 0 28px rgba(56,189,248,0.3)" }}
+                whileHover={{ y: -3, scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 disabled={running || resetting}
-                className="inline-flex items-center gap-2 rounded-2xl border border-cyan-500/40 bg-[rgba(8,47,73,0.45)] px-7 py-4 text-sm font-bold uppercase tracking-wide text-cyan-100 backdrop-blur-xl transition hover:border-electric/70 hover:text-surface disabled:cursor-not-allowed disabled:opacity-60 md:px-8 md:py-4 md:text-base"
+                className="group inline-flex items-center gap-3 rounded-full border border-cyan-500/45 bg-[linear-gradient(140deg,rgba(8,47,73,0.45),rgba(2,6,23,0.78))] px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] text-cyan-100 shadow-[0_0_18px_rgba(56,189,248,0.18)] backdrop-blur-xl transition hover:border-cyan/80 hover:text-surface disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {resetting ? <Loader2 className="h-5 w-5 animate-spin" /> : <RotateCcw className="h-5 w-5" />}
-                Reset
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-cyan-400/60 bg-cyan-500/10">
+                  {resetting ? <Loader2 className="h-4 w-4 animate-spin" /> : <RotateCcw className="h-4 w-4" />}
+                </span>
+                <span className="flex flex-col items-start leading-tight">
+                  <span>{resetting ? "Resetting" : "Reset"}</span>
+                  <span className="text-[9px] font-medium uppercase tracking-[0.18em] text-muted group-hover:text-cyan-200">
+                    State
+                  </span>
+                </span>
               </motion.button>
             </div>
           </motion.div>
@@ -249,11 +257,6 @@ export function HeroSection({ activeSection }: Props) {
           </div>
 
         </motion.div>
-
-        <HeroNavigateDeck
-          active={activeSection}
-          heroScrollProgress={scrollYProgress}
-        />
       </div>
     </section>
   );

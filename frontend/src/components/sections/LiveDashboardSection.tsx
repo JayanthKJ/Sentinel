@@ -4,8 +4,6 @@ import {
   Area,
   AreaChart,
   CartesianGrid,
-  Line,
-  LineChart,
   Pie,
   PieChart,
   Cell,
@@ -182,16 +180,10 @@ export function LiveDashboardSection() {
                 <span>Active Events</span>
                 <Flame className="h-4 w-4 text-electric" />
               </div>
-              <p className="mt-3 font-display text-4xl text-electric">
+              <p className="mt-3 font-display text-4xl font-bold text-electric">
                 {dashboardData?.active_events ?? 0}
-                <span className="text-base text-muted"> events</span>
+                <span className="text-base font-medium text-muted"> events</span>
               </p>
-              {/* <div className="mt-4 h-2 rounded-full bg-bg-primary">
-                <motion.div
-                  className="h-full rounded-full bg-gradient-to-r from-electric to-cyan"
-                  animate={{ width: `${Math.min(100, (temp / 120) * 100)}%` }}
-                />
-              </div> */}
               <p className="mt-2 text-xs text-muted">Live system event stream</p>
             </div>
 
@@ -232,47 +224,91 @@ export function LiveDashboardSection() {
             </div>
           </div>
 
-          <div className="mt-4 grid gap-4 lg:grid-cols-3">
-            <div className="lg:col-span-2 rounded-2xl border border-cyan-500/15 bg-bg-secondary/60 p-3">
-              <div className="mb-2 flex items-center justify-between px-1 text-xs text-muted">
-                <span>Event Activity Trend</span>
-                <span className="text-electric">Live</span>
+          <div className="mt-4 rounded-2xl border border-cyan-500/15 bg-bg-secondary/60 p-3">
+            <div className="mb-2 flex items-center justify-between px-1 text-xs text-muted">
+              <span>Event Activity Trend</span>
+              <span className="text-electric">Live</span>
+            </div>
+            <div className="h-56">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={trendData}>
+                  <defs>
+                    <linearGradient id="flowFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#00D9FF" stopOpacity={0.45} />
+                      <stop offset="100%" stopColor="#00D9FF" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 6" stroke="#1f2937" />
+                  <XAxis dataKey="t" stroke="#64748B" tick={{ fontSize: 10 }} />
+                  <YAxis stroke="#64748B" tick={{ fontSize: 10 }} />
+                  <Tooltip
+                    contentStyle={{
+                      background: "#0B1020",
+                      border: "1px solid rgba(56,189,248,0.35)",
+                      borderRadius: 12,
+                      color: "#F8FAFC",
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="q"
+                    stroke="#38BDF8"
+                    strokeWidth={2}
+                    fill="url(#flowFill)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-2xl border border-cyan-500/15 bg-bg-secondary/60 p-4">
+              <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-muted">
+                <BellRing className="h-4 w-4 text-electric" />
+                Alarm feed
               </div>
-              <div className="h-56">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={trendData}>
-                    <defs>
-                      <linearGradient id="flowFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#00D9FF" stopOpacity={0.45} />
-                        <stop offset="100%" stopColor="#00D9FF" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 6" stroke="#1f2937" />
-                    <XAxis dataKey="t" stroke="#64748B" tick={{ fontSize: 10 }} />
-                    <YAxis stroke="#64748B" tick={{ fontSize: 10 }} />
-                    <Tooltip
-                      contentStyle={{
-                        background: "#0B1020",
-                        border: "1px solid rgba(56,189,248,0.35)",
-                        borderRadius: 12,
-                        color: "#F8FAFC",
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="q"
-                      stroke="#38BDF8"
-                      strokeWidth={2}
-                      fill="url(#flowFill)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+              <p className="mb-3 text-[10px] uppercase tracking-[0.25em] text-muted">
+                {lastGraphRefresh
+                  ? `Auto-refreshed at ${lastGraphRefresh}`
+                  : "Auto-refresh active every 5 seconds"}
+              </p>
+              <div className="space-y-3">
+                {[...alarms]
+                  .sort((a, b) => {
+                    const priorityOrder = { critical: 0, warning: 1, info: 2 };
+                    return (
+                      (priorityOrder[a.priority as keyof typeof priorityOrder] ?? 3) -
+                      (priorityOrder[b.priority as keyof typeof priorityOrder] ?? 3)
+                    );
+                  })
+                  .map((a, index) => (
+                    <div
+                      key={a.incident_id || index}
+                      className={`rounded-xl border px-3 py-2 text-[11px] ${
+                        a.priority === "critical"
+                          ? "border-danger/50 bg-danger/10 text-danger"
+                          : a.priority === "warning"
+                            ? "border-electric/40 bg-electric/5 text-surface"
+                            : "border-cyan-500/20 text-muted"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] uppercase tracking-wide opacity-70">
+                          {formatTimestamp(a.timestamp)}
+                        </p>
+                        <p className="ml-2 text-[10px] opacity-70 text-muted">
+                          {timeAgo(a.timestamp)}
+                        </p>
+                      </div>
+                      <p className="mt-1 leading-snug">{a.incident_title}</p>
+                    </div>
+                  ))}
               </div>
             </div>
 
             <div className="rounded-2xl border border-cyan-500/15 bg-bg-secondary/60 p-4">
-              <p className="text-xs font-semibold text-surface">System Alert Distribution</p>
-              <div className="mt-2 h-44">
+              <p className="mb-2 text-xs font-semibold text-surface">System Alert Distribution</p>
+              <div className="h-44">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -325,83 +361,28 @@ export function LiveDashboardSection() {
                     </span>
                     <span className="shrink-0 tabular-nums font-semibold text-electric">
                       {dashboardData
-                        ? Math.round(
-                            (h.value / dashboardData.total_events) * 100
-                          )
+                        ? Math.round((h.value / dashboardData.total_events) * 100)
                         : 0}%
                     </span>
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
-
-          <div className="mt-4 grid gap-4 lg:grid-cols-3">
-            <div className="rounded-2xl border border-cyan-500/15 bg-bg-secondary/60 p-3 lg:col-span-2">
-              <div className="mb-2 flex items-center justify-between px-1 text-xs text-muted">
-                <span>Alert Intensity Timeline</span>
-              </div>
-              <div className="h-44">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={trendData}
-                  >
-                    <CartesianGrid strokeDasharray="3 6" stroke="#1f2937" />
-                    <XAxis dataKey="t" hide />
-                    <YAxis stroke="#64748B" tick={{ fontSize: 10 }} domain={[0, 2]} />
-                    <Tooltip
-                      contentStyle={{
-                        background: "#0B1020",
-                        border: "1px solid rgba(56,189,248,0.35)",
-                        borderRadius: 12,
-                        color: "#F8FAFC",
-                      }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="v"
-                      stroke="#EF4444"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-cyan-500/15 bg-bg-secondary/60 p-4">
-              <div className="mb-2 flex items-center gap-2 text-xs font-semibold text-muted">
-                <BellRing className="h-4 w-4 text-electric" />
-                Alarm feed
-              </div>
-              <p className="mb-3 text-[10px] uppercase tracking-[0.25em] text-muted">
-                {lastGraphRefresh
-                  ? `Auto-refreshed at ${lastGraphRefresh}`
-                  : "Auto-refresh active every 5 seconds"}
-              </p>
-              <div className="space-y-3">
-                {alarms.map((a, index) => (
-                  <div
-                    key={a.incident_id || index}
-                    className={`rounded-xl border px-3 py-2 text-[11px] ${
-                      a.priority === "critical"
-                        ? "border-danger/50 bg-danger/10 text-danger"
-                        : a.priority === "warning"
-                          ? "border-electric/40 bg-electric/5 text-surface"
-                          : "border-cyan-500/20 text-muted"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="text-[10px] uppercase tracking-wide opacity-70">
-                        {formatTimestamp(a.timestamp)}
-                      </p>
-                      <p className="text-[10px] opacity-70 text-muted ml-2">
-                        {timeAgo(a.timestamp)}
-                      </p>
-                    </div>
-                    <p className="mt-1 leading-snug">{a.incident_title}</p>
-                  </div>
-                ))}
+              <div className="mt-4 rounded-xl border border-cyan-500/20 bg-bg-primary/30 p-3">
+                <p className="text-sm font-semibold text-surface">
+                  See the plant as a <span className="text-electric">living system</span>
+                </p>
+                <p className="mt-1 text-xs text-muted">
+                  Pipes, pumps, and buffers rendered as an always-on holographic topology —
+                  perfect for control room immersion.
+                </p>
+                <div className="mt-2 flex gap-2">
+                  <span className="rounded-full border border-electric/40 bg-electric/10 px-2 py-0.5 text-[10px] font-semibold text-electric">
+                    HX1
+                  </span>
+                  <span className="rounded-full border border-cyan/40 bg-cyan/10 px-2 py-0.5 text-[10px] font-semibold text-cyan">
+                    P1
+                  </span>
+                </div>
               </div>
             </div>
           </div>

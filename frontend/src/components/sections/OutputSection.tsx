@@ -223,7 +223,7 @@ export function OutputSection() {
                   <span>{card.label}</span>
                   <Icon className={`h-4 w-4 ${card.tone}`} />
                 </div>
-                <p className={`mt-4 font-display text-4xl ${card.tone}`}>
+                <p className={`mt-4 font-mono text-5xl font-bold tracking-tight tabular-nums ${card.tone}`}>
                   {loading ? "…" : card.value}
                 </p>
               </div>

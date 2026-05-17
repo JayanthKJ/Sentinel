@@ -43,11 +43,11 @@ export function ScrollToHomeButton() {
           onClick={goToSection}
           whileHover={{ scale: 1.06, y: -2 }}
           whileTap={{ scale: 0.96 }}
-          className="fixed bottom-6 right-6 z-50 inline-flex items-center gap-2 rounded-full border border-cyan-500/40 bg-[rgba(11,16,32,0.88)] px-4 py-3 text-electric shadow-neon-sm backdrop-blur-md transition-colors hover:border-electric/60 hover:text-surface"
+          className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-1.5 rounded-full border border-cyan-500/40 bg-[rgba(11,16,32,0.88)] px-3 py-2 text-electric shadow-neon-sm backdrop-blur-md transition-colors hover:border-electric/60 hover:text-surface"
           aria-label={label}
         >
-          <Icon className="h-5 w-5" strokeWidth={2.25} />
-          <span className="text-xs font-semibold uppercase tracking-[0.22em]">
+          <Icon className="h-4 w-4" strokeWidth={2.25} />
+          <span className="text-[10px] font-semibold uppercase tracking-[0.18em]">
             {label}
           </span>
         </motion.button>
