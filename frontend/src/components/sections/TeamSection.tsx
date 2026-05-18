@@ -3,7 +3,7 @@ import { Github, Linkedin } from "lucide-react";
 
 const TEAM = [
   {
-    name: "Harish J Gowda",
+    name: "Harish Gowda J",
     role: "AI Developer",
     handle: "@harish",
     linkedin: "https://www.linkedin.com/in/harish-gowda-j-2a4361369?utm_source=share_via&utm_content=profile&utm_medium=member_android",
